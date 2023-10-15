@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  project   Project[]
+  @@index([email, password])
+}
+
+model Project {
+  id        Int       @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  @@index([userId])
+}
+
+model Task {
+  id        Int       @id @default(autoincrement())
+  name      String
+  completed Boolean   @default(false)
+  // status    Statuses
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// enum Statuses {
+//   PENDING
+//   IN_PROGRESS
+//   DONE
+// }
